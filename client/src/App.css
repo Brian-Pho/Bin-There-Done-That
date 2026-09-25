@@ -56,46 +56,7 @@ h1 {
 }
 
 .heatmap {
+  width: min(100%, 36rem);
+  height: 28rem;
   margin-bottom: 1.25rem;
-}
-
-.grid {
-  display: grid;
-  gap: 2px;
-  width: min(100%, 28rem);
-  aspect-ratio: 1;
-  background: #ddd;
-  border: 1px solid #ccc;
-}
-
-.cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  background: #fff;
-  color: #222;
-  font-size: clamp(0.55rem, 2.2vw, 0.95rem);
-  font-weight: 600;
-}
-
-.cell-hot {
-  color: #fff;
-}
-
-.scale {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  width: min(100%, 28rem);
-  margin-top: 0.5rem;
-  color: #555;
-  font-size: 0.85rem;
-}
-
-.scale-bar {
-  flex: 1;
-  height: 0.75rem;
-  border: 1px solid #ccc;
-  background: linear-gradient(to right, rgb(0, 0, 255), rgb(255, 0, 0));
 }
