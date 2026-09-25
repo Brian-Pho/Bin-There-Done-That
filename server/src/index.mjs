@@ -8,6 +8,10 @@ const INTERVAL_MS = 1000;
 const MAX_VALUE = 20;
 const PORT = Number(process.env.PORT) || 3001;
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -26,7 +30,7 @@ io.on("connection", (socket) => {
   console.log(`client connected: ${socket.id}`);
 
   const timer = setInterval(() => {
-    const n = Math.floor(Math.random() * MAX_VALUE);
+    const n = getRandomInt(MAX_VALUE);
     socket.emit("number", n);
   }, INTERVAL_MS);
 
