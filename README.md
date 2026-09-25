@@ -15,15 +15,16 @@ The client currently connects over Socket.IO, lets you set **N**, and logs recei
 Later it will bin on the client and render with **Plotly.js** (`react-plotly.js`):
 
 - Keep the **NxN count grid in React state**
-- On each `number`, bin with zero-based remainder and quotient, wrapping into the grid:
-  - `col = n % N`
-  - `row = Math.floor(n / N) % N`
+- On each `number`, treat **n as a 1-based cell index**, then unpack with zero-based remainder and quotient (row-major, wrapping every `N²` cells):
+  - `index = n - 1`
+  - `col = index % N`
+  - `row = Math.floor(index / N) % N`
   - increment that cell and store a **new** grid (do not mutate in place)
 - Pass the grid to Plotly as heatmap `z` so `react-plotly.js` calls `Plotly.react` when state updates
 - Color cells with a conventional **blue-to-red** `colorscale`, normalized to the current maximum count (zero-count cells stay uncolored)
 - Update `zmin`/`zmax` (or Plotly autoscale) as the max count changes
 
-The PDF examples (`17 → <0,0>`, `8 → <1,3>` on a 4×4 grid) do not match this remainder/quotient mapping (nor the variant without `% N` on the quotient). This repo uses the wrapping formula above unless the spec is clarified.
+On a 4×4 grid this matches the spec examples: `17 → <0, 0>` (`index = 16`) and `8 → <1, 3>` (`index = 7`).
 
 ### Alternatives considered
 
