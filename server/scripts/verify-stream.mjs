@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 
 const URL = process.env.SERVER_URL ?? "http://localhost:3001";
-const MAX_VALUE = 1_000_000_000;
+const MAX_VALUE = 20;
 const SAMPLE_COUNT = 3;
 const TIMEOUT_MS = 8000;
 

@@ -5,7 +5,7 @@ import { Server } from "socket.io";
 /** Milliseconds between emitted numbers (1 value per second). */
 const INTERVAL_MS = 1000;
 /** Inclusive-exclusive upper bound for generated nonnegative integers. */
-const MAX_VALUE = 1_000_000_000;
+const MAX_VALUE = 20;
 const PORT = Number(process.env.PORT) || 3001;
 
 const app = express();

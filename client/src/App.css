@@ -1,0 +1,46 @@
+.app {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.status {
+  margin: 0 0 1.25rem;
+  color: #555;
+}
+
+.status-disconnected {
+  color: #c62828;
+}
+
+.status-connected {
+  color: #2e7d32;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.field input,
+.field textarea {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 16rem;
+}
