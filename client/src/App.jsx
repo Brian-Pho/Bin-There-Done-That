@@ -123,17 +123,19 @@ export default function App() {
     });
 
     socket.on("number", (n) => {
-      const size = dimensionRef.current;
-      const index = n - 1;
-      const col = ((index % size) + size) % size;
-      const row = ((Math.floor(index / size) % size) + size) % size;
+      if (n !== 0) {
+        const size = dimensionRef.current;
+        const index = n - 1;
+        const col = ((index % size) + size) % size;
+        const row = ((Math.floor(index / size) % size) + size) % size;
 
-      setCounts((prev) => {
-        const base = prev.length === size ? prev : emptyGrid(size);
-        const next = base.map((line) => line.slice());
-        next[row][col] = (next[row][col] ?? 0) + 1;
-        return next;
-      });
+        setCounts((prev) => {
+          const base = prev.length === size ? prev : emptyGrid(size);
+          const next = base.map((line) => line.slice());
+          next[row][col] = (next[row][col] ?? 0) + 1;
+          return next;
+        });
+      }
 
       setLog((prev) => {
         const next = prev === "" ? String(n) : `${prev}\n${n}`;
@@ -167,6 +169,7 @@ export default function App() {
     dimensionRef.current = next;
     setDimension(next);
     setCounts(emptyGrid(next));
+    setLog("");
   };
 
   const dimensionError =
@@ -210,7 +213,8 @@ export default function App() {
       ) : (
         <p className="hint">
           Value n is a 1-based index: column (n - 1) % N, row floor((n -
-          1) / N) % N. Changing N clears the counts.
+          1) / N) % N. A 0 is logged and not binned. Changing N clears the
+          counts.
         </p>
       )}
 
