@@ -1,19 +1,21 @@
 {
-  "name": "server",
+  "name": "bin-there-done-that-server",
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "description": "Socket.IO data server that streams nonnegative integers while a client is connected",
   "main": "src/index.mjs",
   "scripts": {
     "start": "node src/index.mjs",
     "watch": "nodemon src/index.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "verify": "node scripts/verify-stream.mjs"
   },
   "dependencies": {
     "express": "^4.21.2",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "socket.io-client": "^4.8.1"
   }
 }

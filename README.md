@@ -1,54 +1,46 @@
 # Bin There, Done That
 
-Precision Neuroscience full-stack project: real-time visualization of a streaming integer source.
+Precision Neuroscience full-stack exercise: stream nonnegative integers from a cloud-style data server and visualize them as a real-time NxN heatmap on a local web client.
 
-The **data server** lives in `server/` (run locally now; intended as the cloud stream). The **web client** will live in `client/` and bin that stream into a heatmap. This repository currently implements the server.
+## Approach
 
-## Spec
+**Chosen: Socket.IO integer stream, client-side binning** (Approach 1).
 
-- The client renders an NxN grid (N is configurable).
-- The client reads a stream of nonnegative integers from the server.
-- Each number is binned by zero-based remainder and quotient:
+When a client connects, the server starts a **per-socket continuous stream** of nonnegative integers (`number` events, ~20/sec). Disconnecting that client stops its timer. Independent clients get independent streams.
 
+The client (not yet implemented) will:
+
+- Render a configurable **NxN** grid
+- Bin each number with zero-based remainder and quotient, wrapping into the grid:
   - `col = n % N`
   - `row = Math.floor(n / N) % N`
+- Keep a running hit count per cell
+- Color cells with a conventional **blue-to-red** scale normalized to the current maximum count (zero-count cells stay uncolored)
+- Update the grid and color scale as numbers arrive
 
-- Each cell keeps a running hit count.
-- Cell color is a conventional blue-to-red heatmap, normalized to the current maximum count. Zero-count cells are uncolored.
-- The grid and color scale update as numbers arrive.
+The PDF examples (`17 → <0,0>`, `8 → <1,3>` on a 4×4 grid) do not match this remainder/quotient mapping (nor the variant without `% N` on the quotient). This repo uses the wrapping formula above unless the spec is clarified.
 
-The assignment PDF examples (`17 → <0,0>`, `8 → <1,3>` on a 4x4 grid) do not match this remainder/quotient mapping (or the non-wrapping variant). The formulas above are what the client will use unless the spec is clarified.
+### Alternatives considered
 
-## Approach 1 (implemented)
+- **SSE:** HTTP-native one-way stream; extra REST needed to control N or pause. Not used so the project can follow the same Socket.IO split as [Chat-App](https://github.com/Brian-Pho/Chat-App).
+- **Server-side binning:** server holds the grid and sends snapshots/deltas. Better fit for a later server-side rendering discussion; weaker if the client should interpret the raw integer stream.
 
-**Socket.IO integer stream, client-side binning.**
+### Bonus (discussion only)
 
-When a client connects, the server starts a **per-socket continuous stream** of nonnegative integers and emits each value as a `number` event. Disconnecting clears that socket’s timer. Streams are independent; there is no global generator.
+- **3D:** same NxN counts, extruded as bar height (for example Three.js); color still from the normalized count.
+- **Server-side rendering:** sending pixels/frames instead of integers or counts trades client CPU for bandwidth, latency, and weaker interactivity (changing N, inspecting cells). Multiple viewers would share one render pipeline or multiply GPU cost.
 
-- Interval: 50ms (~20 numbers/sec), constant `STREAM_INTERVAL_MS` in `server/src/index.mjs`
-- Values: random integers in `[0, 1e9)`
-- Port: 3001
+## Layout
 
-The **client** (not built yet) will own the count grid, max, color map, and heatmap.
-
-### Run the server
-
-```bash
-cd server
-npm ci
-npm start
+```
+client/    local visualization (placeholder until the server is confirmed)
+server/    Express + Socket.IO data stream
 ```
 
-Use `npm run watch` while editing the server. Open `http://localhost:3001/` for the unused HTTP page. A Socket.IO client should connect to that origin and listen for `number`.
+## Run the server
 
-## Alternatives considered
+1. `cd server`
+2. `npm ci`
+3. `npm start`
 
-**2. Server-Sent Events, client-side binning.** Unidirectional HTTP stream (`GET /stream`). Simpler through some proxies, but weaker for later client→server control (pause, change N) and a worse match to the existing Chat-App Socket.IO split.
-
-**3. Server-side binning, stream grid updates.** Server holds the NxN counts and sends snapshots or dirty-cell deltas. Better for the server-side rendering bonus and high rates, but the assignment’s client is supposed to interpret the raw integer stream.
-
-## Bonus discussion (not built)
-
-**3D.** Keep the same NxN bins and colors; extrude each cell’s count as height (for example Three.js boxes). Streaming and binning stay 2D; only the renderer changes.
-
-**Server-side rendering.** Sending pixels or frames moves CPU/GPU work and color mapping to the server. That can help thin clients and keep many viewers in sync, but it costs bandwidth, adds latency, and makes interaction (changing N, hover) heavier. Streaming counts or cell deltas is usually a better middle ground than video-like frames unless the visualization itself is expensive.
+The server listens on [http://localhost:3001/](http://localhost:3001/) by default (`PORT` env var to override). Use `npm run watch` while editing. With the server running, `npm run verify` connects over Socket.IO, reads 10 numbers, then disconnects (`SERVER_URL` if not on 3001).

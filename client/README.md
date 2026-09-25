@@ -1,10 +1,5 @@
 # Client
 
-Placeholder for the local web visualization.
+Local web visualization for “Bin There, Done That.”
 
-The React heatmap client is not implemented yet. After the Socket.IO data server is confirmed, this folder will receive a Vite + React app that:
-
-- Connects to `http://localhost:3001`
-- Listens for `number` events
-- Bins values into an NxN grid
-- Renders a blue-to-red heatmap
+This folder is a placeholder. The Socket.IO heatmap client will be added after the data server is confirmed.
