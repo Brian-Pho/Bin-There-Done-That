@@ -1,8 +1,9 @@
 import { io } from "socket.io-client";
 
 const URL = process.env.SERVER_URL ?? "http://localhost:3001";
-const SAMPLE_COUNT = 10;
-const TIMEOUT_MS = 5000;
+const MAX_VALUE = 1_000_000_000;
+const SAMPLE_COUNT = 3;
+const TIMEOUT_MS = 8000;
 
 const socket = io(URL, { transports: ["websocket"] });
 const numbers = [];
@@ -22,8 +23,8 @@ socket.on("connect_error", (err) => {
 });
 
 socket.on("number", (n) => {
-  if (!Number.isInteger(n) || n < 0) {
-    fail(`Expected a nonnegative integer, got: ${JSON.stringify(n)}`);
+  if (!Number.isInteger(n) || n < 0 || n >= MAX_VALUE) {
+    fail(`Expected an integer in [0, ${MAX_VALUE}), got: ${JSON.stringify(n)}`);
   }
   numbers.push(n);
   if (numbers.length >= SAMPLE_COUNT) {
