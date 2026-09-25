@@ -10,9 +10,7 @@ Precision Neuroscience full-stack exercise: stream nonnegative integers from a c
 
 When a client connects, the server starts a **per-socket continuous stream** of nonnegative integers below `20` (`number` events, 1/sec). Disconnecting that client stops its timer. Independent clients get independent streams.
 
-The client currently connects over Socket.IO, lets you set **N**, and logs received integers. The heatmap is not built yet.
-
-Later it will bin on the client and render with **Plotly.js** (`react-plotly.js`):
+The client connects over Socket.IO, lets you set **N**, bins incoming integers into an NxN count grid in React state, and renders that grid with **Plotly.js** (`react-plotly.js`):
 
 - Keep the **NxN count grid in React state**
 - On each `number`, treat **n as a 1-based cell index**, then unpack with zero-based remainder and quotient (row-major, wrapping every `N²` cells):
@@ -23,6 +21,7 @@ Later it will bin on the client and render with **Plotly.js** (`react-plotly.js`
 - Pass the grid to Plotly as heatmap `z` so `react-plotly.js` calls `Plotly.react` when state updates
 - Color cells with a conventional **blue-to-red** `colorscale`, normalized to the current maximum count (zero-count cells stay uncolored)
 - Update `zmin`/`zmax` (or Plotly autoscale) as the max count changes
+- Changing N clears the counts; received values are also listed below the grid
 
 On a 4×4 grid this matches the spec examples: `17 → <0, 0>` (`index = 16`) and `8 → <1, 3>` (`index = 7`).
 
@@ -34,13 +33,13 @@ On a 4×4 grid this matches the spec examples: `17 → <0, 0>` (`index = 16`) an
 
 ### Bonus (discussion only)
 
-- **3D:** same NxN counts, extruded as bar height (for example Three.js); color still from the normalized count.
-- **Server-side rendering:** sending pixels/frames instead of integers or counts trades client CPU for bandwidth, latency, and weaker interactivity (changing N, inspecting cells). Multiple viewers would share one render pipeline or multiply GPU cost.
+- **3D:** use cubes to display counts. Same NxN counts; color still from the normalized count.
+- **Server-side rendering:** the server does binning and heatmap generation. That trades reduced client CPU usage for more data sent between server and client. Sending pixels/frames instead of integers or counts also costs bandwidth and latency and weakens interactivity (changing N, inspecting cells).
 
 ## Layout
 
 ```
-client/    Vite + React UI (grid size + live number log)
+client/    Vite + React UI (NxN Plotly heatmap + live number log)
 server/    Express + Socket.IO data stream
 ```
 
