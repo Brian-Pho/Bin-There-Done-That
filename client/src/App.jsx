@@ -15,53 +15,33 @@ function emptyGrid(size) {
   return Array.from({ length: size }, () => Array(size).fill(null));
 }
 
-function hsvToRgb(hue, saturation, value) {
-  const chroma = value * saturation;
-  const sector = hue / 60;
-  const x = chroma * (1 - Math.abs((sector % 2) - 1));
-  let red = 0;
-  let green = 0;
-  let blue = 0;
-  if (sector < 1) {
-    red = chroma;
-    green = x;
-  } else if (sector < 2) {
-    red = x;
-    green = chroma;
-  } else if (sector < 3) {
-    green = chroma;
-    blue = x;
-  } else if (sector < 4) {
-    green = x;
-    blue = chroma;
-  } else if (sector < 5) {
-    red = x;
-    blue = chroma;
-  } else {
-    red = chroma;
-    blue = x;
-  }
-  const match = value - chroma;
-  const channel = (amount) => Math.round((amount + match) * 255);
-  return `rgb(${channel(red)}, ${channel(green)}, ${channel(blue)})`;
-}
+/** Stops from Plotly.js's built-in Jet colorscale, used for label contrast. */
+const JET = [
+  [0, [0, 0, 131]],
+  [0.125, [0, 60, 170]],
+  [0.375, [5, 255, 255]],
+  [0.625, [255, 255, 0]],
+  [0.875, [250, 0, 0]],
+  [1, [128, 0, 0]],
+];
 
-/** Hue 240 (blue) at the minimum, 60 (yellow) in the middle, 0 (red) at the maximum. */
-function rainbowColorscale(steps = 12) {
-  const scale = [];
-  for (let i = 0; i <= steps; i += 1) {
-    const t = i / steps;
-    const hue = t <= 0.5 ? 240 - 360 * t : 120 * (1 - t);
-    scale.push([t, hsvToRgb(hue, 1, 1)]);
+function jetRgb(t) {
+  let index = 1;
+  while (index < JET.length - 1 && JET[index][0] < t) {
+    index += 1;
   }
-  return scale;
+  const [start, startColor] = JET[index - 1];
+  const [end, endColor] = JET[index];
+  const span = end - start;
+  const mix = span === 0 ? 0 : (t - start) / span;
+  return startColor.map(
+    (channel, channelIndex) => channel + (endColor[channelIndex] - channel) * mix,
+  );
 }
 
 function annotationColor(count, minCount, maxCount) {
   const t = maxCount === minCount ? 1 : (count - minCount) / (maxCount - minCount);
-  const hue = t <= 0.5 ? 240 - 360 * t : 120 * (1 - t);
-  const color = hsvToRgb(hue, 1, 1);
-  const [red, green, blue] = color.match(/\d+/g).map(Number);
+  const [red, green, blue] = jetRgb(t);
   const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
   return luminance > 0.6 ? "#111" : "#fff";
 }
@@ -241,7 +221,7 @@ export default function App() {
             {
               z: counts,
               type: "heatmap",
-              colorscale: rainbowColorscale(),
+              colorscale: "Jet",
               showscale: true,
               hoverongaps: false,
               xgap: 1,
