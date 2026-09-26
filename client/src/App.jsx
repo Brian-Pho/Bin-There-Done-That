@@ -6,6 +6,7 @@ import "./App.css";
 
 const SERVER_URL = "http://localhost:3001";
 const MAX_LOG_LINES = 200;
+const DEFAULT_N = 4;
 const MIN_N = 1;
 const MAX_N = 40;
 
@@ -21,13 +22,13 @@ function parseDimension(text) {
 }
 
 export default function App() {
-  const [dimensionText, setDimensionText] = useState("4");
-  const [dimension, setDimension] = useState(4);
-  const [counts, setCounts] = useState(() => emptyGrid(4));
+  const [dimensionText, setDimensionText] = useState(String(DEFAULT_N));
+  const [dimension, setDimension] = useState(DEFAULT_N);
+  const [counts, setCounts] = useState(() => emptyGrid(DEFAULT_N));
   const [log, setLog] = useState("");
   const [status, setStatus] = useState("Connecting…");
   const logRef = useRef(null);
-  const dimensionRef = useRef(4);
+  const dimensionRef = useRef(DEFAULT_N);
 
   useEffect(() => {
     const socket = io(SERVER_URL, { transports: ["websocket"] });
